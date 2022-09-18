@@ -14,6 +14,35 @@ logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
                     filename='bot.log')
 
 
+def calc(update, context):
+    args = context.args
+    if len(args) < 3:
+        update.message.reply_text("Некорректные входные данные!")
+        raise ValueError
+
+    if args[1] == "/" and args[2] == "0":
+        update.message.reply_text("На ноль делить нельзя!")
+        raise ZeroDivisionError
+
+
+
+
+    if args[1] == "+":
+        result = int(args[0]) + int(args[2])
+        update.message.reply_text(result)
+    elif args[1] == "-":
+        result = int(args[0]) - int(args[2])
+        update.message.reply_text(result)
+    elif args[1] == "*":
+        result = int(args[0]) * int(args[2])
+        update.message.reply_text(result)
+    elif args[1] == "/":
+        result = int(args[0]) / int(args[2])
+        update.message.reply_text(result)
+
+    print(args)
+
+
 #Функция создаёт пустой список городов, которые уже называли.
 def restart_game(user_data):
     user_data['city'] = []
@@ -22,6 +51,7 @@ def restart_game(user_data):
 #Функция возвращает город, который начинается на последнюю букву предыдущего города.
 def get_cityname(user_data):
     for cityname in cities_list:
+
         if cityname not in user_data and user_data[-1][-1].upper() == cityname[0]:
             user_data.append(cityname)
             return cityname
@@ -40,11 +70,13 @@ def cityname_in_list(cityname, user_data):
         return False
 
 
+
 #Функция впроверяет город по всем критериям и выводит подходящий, если такой есть в списке.
 def cities(update, context):
     if context.user_data.get('city') == None:
         restart_game(context.user_data)
     cityname = context.args[0].capitalize()
+
     if cityname_in_list(cityname, context.user_data['city']):
         update.message.reply_text(f"Твой город - {cityname}")
         new_city = get_cityname(context.user_data['city'])
@@ -140,6 +172,7 @@ def main():
     dp.add_handler(CommandHandler("wordcount", word_counter))
     dp.add_handler(CommandHandler("next_full_moon", next_full_moon))
     dp.add_handler(CommandHandler("cities", cities))
+    dp.add_handler(CommandHandler("calc", calc))
 
 
     bot.start_polling()
